@@ -5,10 +5,30 @@ import { authorizeRoles } from '../middleware/roles.js';
 import { registerForEvent, myRegistrations, participantsForEvent, checkInParticipant, exportParticipantsCsv, checkRegistrationStatus } from '../controllers/registrationController.js';
 
 const router = Router();
+const parsedRegistrationWindowMs = Number.parseInt(
+  process.env.REGISTRATION_RATE_LIMIT_WINDOW_MS ?? '',
+  10
+);
+
+const parsedRegistrationMax = Number.parseInt(
+  process.env.REGISTRATION_RATE_LIMIT_MAX ?? '',
+  10
+);
+
+const registrationWindowMs =
+  Number.isFinite(parsedRegistrationWindowMs) &&
+  parsedRegistrationWindowMs > 0
+    ? parsedRegistrationWindowMs
+    : 60 * 1000;
+
+const registrationMax =
+  Number.isFinite(parsedRegistrationMax) &&
+  parsedRegistrationMax > 0
+    ? parsedRegistrationMax
+    : 5;
 const registrationRateLimiter = rateLimit({
-  windowMs:
-    process.env.REGISTRATION_RATE_LIMIT_WINDOW_MS || 60 * 1000,
-  max: process.env.REGISTRATION_RATE_LIMIT_MAX || 5,
+  windowMs: registrationWindowMs,
+  max: registrationMax,
   message: {
     message: 'Too many registration attempts. Please try again later.',
   },
