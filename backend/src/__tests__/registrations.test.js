@@ -7,7 +7,53 @@ import Event from '../models/Event.js';
 import Registration from '../models/Registration.js';
 
 describe('Registrations API', () => {
+  
   describe('POST /api/registrations/:id/register', () => {
+    it('should prevent duplicate registrations', async () => {
+  const user = await User.create({
+    name: 'Duplicate User',
+    email: 'duplicate@example.com',
+    password: 'password123',
+    role: 'customer'
+  });
+
+  const organizer = await User.create({
+    name: 'Organizer',
+    email: 'duporganizer@example.com',
+    password: 'password123',
+    role: 'organizer'
+  });
+
+  const loginRes = await request(app)
+    .post('/api/auth/login')
+    .send({
+      email: 'duplicate@example.com',
+      password: 'password123'
+    });
+
+  const event = await Event.create({
+    title: 'Duplicate Registration Event',
+    description: 'Testing duplicate registration prevention',
+    category: 'Tech',
+    date: new Date(),
+    location: 'Delhi',
+    capacity: 5,
+    status: 'approved',
+    organizer: organizer._id
+  });
+
+  await request(app)
+    .post(`/api/registrations/${event._id}/register`)
+    .set('Authorization', `Bearer ${loginRes.body.token}`);
+
+  const secondRes = await request(app)
+    .post(`/api/registrations/${event._id}/register`)
+    .set('Authorization', `Bearer ${loginRes.body.token}`);
+
+  expect(secondRes.statusCode).toBe(400);
+
+  expect(secondRes.body.message).toMatch(/already registered/i);
+});
     it('should register user for an event', async () => {
       const user = await User.create({
         name: 'Test User',
