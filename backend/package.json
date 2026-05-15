@@ -48,6 +48,10 @@
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "<rootDir>/src/__tests__/setup.js"
-    ]
+    ],
+    "testPathIgnorePatterns": [
+  "<rootDir>/src/__tests__/setup.js"
+]
+    
   }
 }
