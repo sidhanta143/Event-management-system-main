@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff ,X} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 import { API_BASE_URL } from "../config";
@@ -64,6 +64,16 @@ export default function SignIn() {
                             backgroundSize: '24px 24px'
                         }}
                     >
+
+                        {/* Close Button */}
+                        <button
+                            onClick={() => navigate("/")}
+                            className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors z-20"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+
                         {/* Title */}
                         <div className="text-center mb-10 relative z-10">
                             <h1 className="text-3xl font-bold text-white tracking-tight">
